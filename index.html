@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Presidencial 2025 — Voto en el Extranjero</title>
+
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #d1d5db;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --primary: #005CA9;
+  --primary-dark: #00407f;
+  --bar-bg: #e5e7eb;
+}
+
+body.dark {
+  color-scheme: dark;
+  --bg: #020617;
+  --card-bg: #020617;
+  --border: #1e293b;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --primary: #1d4ed8;
+  --primary-dark: #1e40af;
+  --bar-bg: #0f172a;
+}
+
+body {
+  margin:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text-main);
+}
+
+.wrap {
+  max-width:760px;
+  margin:0 auto;
+  padding:12px;
+}
+
+.card {
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 1px 3px rgba(15,23,42,.08);
+}
+
+/* Header */
+.header {
+  padding:12px 16px 6px;
+  border-bottom:1px solid var(--border);
+}
+.header h1 {
+  margin:0;
+  font-size:20px;
+  font-weight:800;
+}
+.ts {
+  margin-top:4px;
+  font-size:12px;
+  color:var(--text-muted);
+}
+
+/* Controls */
+.controls {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+}
+.control-group {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+}
+select {
+  padding:6px 10px;
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--card-bg);
+  color:var(--text-main);
+}
+input[type="search"] {
+  padding:6px 10px;
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--card-bg);
+  color:var(--text-main);
+}
+.dark-toggle {
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-bg);
+  cursor:pointer;
+  font-size:12px;
+}
+
+/* Country banner */
+.section-title {
+  font-size:13px;
+  font-weight:700;
+  background:var(--primary);
+  color:#ffffff;
+  padding:8px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.section-title span:last-child{
+  font-size:11px;
+  opacity:.9;
+}
+
+/* Candidate rows */
+.candidate-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  gap:6px;
+}
+.candidate-info {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.candidate-photo {
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--border);
+}
+.party-badge {
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:11px;
+  font-weight:700;
+  color:#ffffff;
+  display:inline-block;
+}
+.bar-rail {
+  width:120px;
+  background:var(--bar-bg);
+  height:6px;
+  border-radius:6px;
+  overflow:hidden;
+}
+.bar-fill {
+  height:6px;
+  border-radius:6px;
+}
+.percent {
+  font-weight:700;
+  font-size:12px;
+  margin-left:6px;
+}
+.winner-tag {
+  background:#FFD400;
+  font-size:11px;
+  padding:2px 4px;
+  border-radius:4px;
+  font-weight:700;
+  margin-left:6px;
+}
+.candidate-row.winner {
+  background:rgba(59,130,246,0.05);
+}
+
+/* Totals & footer */
+.total-box {
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+  background:rgba(148,163,184,0.08);
+  font-size:13px;
+}
+.total-box b{font-weight:700;}
+.footer {
+  padding:8px 16px 10px;
+  font-size:11px;
+  color:var(--text-muted);
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+@media (max-width:600px){
+  .candidate-row{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .bar-rail{width:100px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <!-- Header -->
+    <div class="header">
+      <h1>Presidencial 2025 — Voto en el Extranjero</h1>
+      <div class="ts" id="ts">Actualizado…</div>
+    </div>
+
+    <!-- Controles -->
+    <div class="controls">
+      <div class="control-group">
+        <label for="countrySelect">País:</label>
+        <select id="countrySelect"></select>
+      </div>
+      <div class="control-group">
+        <span>Buscar:</span>
+        <input type="search" id="countrySearch" placeholder="Escribe un país…" />
+      </div>
+      <button id="darkToggle" class="dark-toggle">🌙 Modo oscuro</button>
+    </div>
+
+    <!-- Banner país -->
+    <div id="countryTitle" class="section-title">
+      <span>—</span><span></span>
+    </div>
+
+    <!-- Resultados -->
+    <div id="results"></div>
+
+    <!-- Totales -->
+    <div class="total-box" id="totalBox">
+      Total votos válidos (exterior): —
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>Actualiza cada 60s · Fuente: Google Sheets (voto exterior)</span>
+      <span id="ts2"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// === CONFIG GOOGLE SHEETS ===
+const SHEET_URL =
+ "https://docs.google.com/spreadsheets/d/1e1hdX19TAZIiOnTfPgcCmfOh0HujEHWNEYn5WBiAFz8/export?format=csv&gid=327892612";
+
+// BANDERAS
+const FLAGS = {
+  "Nueva Zelanda": "🇳🇿",
+  "Australia": "🇦🇺",
+  "China": "🇨🇳",
+  "Corea": "🇰🇷",
+  "Vietnam": "🇻🇳",
+  "Tailandia": "🇹🇭",
+  "Singapur": "🇸🇬",
+  "Japon": "🇯🇵",
+  "Indonesia": "🇮🇩",
+  "Filipias": "🇵🇭",
+  "India": "🇮🇳",
+  "Emiratos Arabes": "🇦🇪",
+  "Jordania": "🇯🇴",
+  "Israel": "🇮🇱",
+  "El Libano": "🇱🇧",
+  "Alemania": "🇩🇪",
+  "Austria": "🇦🇹",
+  "Belgica": "🇧🇪",
+  "Croacia": "🇭🇷",
+  "Dinamarca": "🇩🇰",
+  "España": "🇪🇸",
+  "Federacion Rusa": "🇷🇺",
+  "Finlandia": "🇫🇮",
+  "Francia": "🇫🇷",
+  "Grecia": "🇬🇷",
+  "Hungria": "🇭🇺",
+  "Irlanda": "🇮🇪",
+  "Italia": "🇮🇹",
+  "Noruega": "🇳🇴",
+  "Paises Bajos": "🇳🇱",
+  "Polonia": "🇵🇱",
+  "Portugal": "🇵🇹",
+  "Reino Unido": "🇬🇧",
+  "Republica Checa": "🇨🇿",
+  "Rumania": "🇷🇴",
+  "Suecia": "🇸🇪",
+  "Suiza": "🇨🇭",
+  "Turquia": "🇹🇷",
+  "Argelia": "🇩🇿",
+  "Egipto": "🇪🇬",
+  "Kenia": "🇰🇪",
+  "Marruecos": "🇲🇦",
+  "Sudafrica": "🇿🇦",
+  "Argentina": "🇦🇷",
+  "Bolivia": "🇧🇴",
+  "Brasil": "🇧🇷",
+  "Canada": "🇨🇦",
+  "Colombia": "🇨🇴",
+  "Cuba": "🇨🇺",
+  "Ecuador": "🇪🇨",
+  "El Salvador": "🇸🇻",
+  "Estados Unidos": "🇺🇸",
+  "Guatemala": "🇬🇹",
+  "Haiti": "🇭🇹",
+  "Honduras": "🇭🇳",
+  "Jamaica": "🇯🇲",
+  "Mexico": "🇲🇽",
+  "Nicaragua": "🇳🇮",
+  "Panama": "🇵🇦",
+  "Paraguay": "🇵🇾",
+  "Peru": "🇵🇪",
+  "Republica Dominicana": "🇩🇴",
+  "Uruguay": "🇺🇾"
+};
+
+// CONTINENTES
+const CONTINENTES = {
+  "Nueva Zelanda": "Oceanía",
+  "Australia": "Oceanía",
+  "China": "Asia",
+  "Corea": "Asia",
+  "Vietnam": "Asia",
+  "Tailandia": "Asia",
+  "Singapur": "Asia",
+  "Japon": "Asia",
+  "Indonesia": "Asia",
+  "Filipias": "Asia",
+  "India": "Asia",
+  "Emiratos Arabes": "Asia",
+  "Jordania": "Asia",
+  "Israel": "Asia",
+  "El Libano": "Asia",
+  "Alemania": "Europa",
+  "Austria": "Europa",
+  "Belgica": "Europa",
+  "Croacia": "Europa",
+  "Dinamarca": "Europa",
+  "España": "Europa",
+  "Federacion Rusa": "Europa",
+  "Finlandia": "Europa",
+  "Francia": "Europa",
+  "Grecia": "Europa",
+  "Hungria": "Europa",
+  "Irlanda": "Europa",
+  "Italia": "Europa",
+  "Noruega": "Europa",
+  "Paises Bajos": "Europa",
+  "Polonia": "Europa",
+  "Portugal": "Europa",
+  "Reino Unido": "Europa",
+  "Republica Checa": "Europa",
+  "Rumania": "Europa",
+  "Suecia": "Europa",
+  "Suiza": "Europa",
+  "Turquia": "Europa",
+  "Argelia": "África",
+  "Egipto": "África",
+  "Kenia": "África",
+  "Marruecos": "África",
+  "Sudafrica": "África",
+  "Argentina": "América",
+  "Bolivia": "América",
+  "Brasil": "América",
+  "Canada": "América",
+  "Colombia": "América",
+  "Cuba": "América",
+  "Ecuador": "América",
+  "El Salvador": "América",
+  "Estados Unidos": "América",
+  "Guatemala": "América",
+  "Haiti": "América",
+  "Honduras": "América",
+  "Jamaica": "América",
+  "Mexico": "América",
+  "Nicaragua": "América",
+  "Panama": "América",
+  "Paraguay": "América",
+  "Peru": "América",
+  "Republica Dominicana": "América",
+  "Uruguay": "América"
+};
+
+// PARTIDOS → COLORES
+const PARTY_COLORS = {
+  "PDG": "#9333EA",
+  "PC": "#E5252A",
+  "IND": "#6b7280",
+  "PNL": "#6b7280",
+  "REP": "#1D4ED8",
+  "UDI": "#059669"
+};
+
+let candidates = [];
+let parties = [];
+let photos = [];
+let countries = []; // {name, continent}
+let votes = [];     // [ [v1..vn], ... ]
+let globalTotals = []; // totales por candidato
+
+function parseCSV(text){
+  const lines = text.trim().split(/\r?\n/).map(l=>l.split(","));
+  candidates = lines[0].slice(1);
+  parties    = lines[1].slice(1);
+  photos     = lines[2].slice(1);
+
+  countries = [];
+  votes = [];
+
+  for(let i=4;i<lines.length;i++){
+    if(!lines[i][0]) continue;
+    const name = lines[i][0].trim();
+    const cont = CONTINENTES[name] || "Otro";
+    countries.push({name, continent: cont});
+    votes.push(lines[i].slice(1).map(n=>Number(n)||0));
+  }
+
+  // total global dinámico
+  globalTotals = new Array(candidates.length).fill(0);
+  votes.forEach(row=>{
+    row.forEach((v,idx)=>globalTotals[idx]+=v);
+  });
+}
+
+function buildCountryOptions(filter=""){
+  const sel = document.getElementById("countrySelect");
+  const f = filter.trim().toLowerCase();
+  sel.innerHTML = "";
+
+  // orden de continentes
+  const order = ["América","Europa","Asia","África","Oceanía","Otro"];
+
+  // opción global
+  const optGlobal = document.createElement("option");
+  optGlobal.value = "GLOBAL";
+  optGlobal.textContent = "🌎 Total voto exterior";
+  sel.appendChild(optGlobal);
+
+  order.forEach(cont=>{
+    const groupCountries = countries
+      .map((c,idx)=>({idx,...c}))
+      .filter(c=>c.continent===cont)
+      .filter(c=>!f || c.name.toLowerCase().includes(f));
+    if(!groupCountries.length) return;
+
+    const og = document.createElement("optgroup");
+    og.label = cont;
+    groupCountries.forEach(c=>{
+      const opt = document.createElement("option");
+      const flag = FLAGS[c.name] ? FLAGS[c.name]+" " : "";
+      opt.value = String(c.idx);
+      opt.textContent = flag + c.name;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+}
+
+function renderCountry(value){
+  const resultsDiv = document.getElementById("results");
+  const titleDiv = document.getElementById("countryTitle");
+  const totalBox = document.getElementById("totalBox");
+  resultsDiv.innerHTML = "";
+
+  let titleLeft = "";
+  let titleRight = "";
+  let rowVotes = [];
+  let totalLocal = 0;
+
+  const totalGlobal = globalTotals.reduce((a,b)=>a+b,0);
+
+  if(value === "GLOBAL"){
+    titleLeft = "🌎 VOTO EXTERIOR — TOTAL";
+    titleRight = totalGlobal ? totalGlobal.toLocaleString("es-CL") : "";
+    rowVotes = [...globalTotals];
+    totalLocal = totalGlobal;
+  }else{
+    const idx = Number(value);
+    const c = countries[idx];
+    if(!c){ return; }
+    const flag = FLAGS[c.name] ? FLAGS[c.name] + " " : "";
+    titleLeft = `${flag}${c.name.toUpperCase()}`;
+    titleRight = c.continent.toUpperCase();
+    rowVotes = votes[idx];
+    totalLocal = rowVotes.reduce((a,b)=>a+b,0);
+  }
+
+  titleDiv.innerHTML = `<span>${titleLeft}</span><span>${titleRight}</span>`;
+
+  // armar objetos de candidato
+  const list = candidates.map((name,idx)=>({
+    name,
+    party: parties[idx],
+    photo: photos[idx],
+    votes: rowVotes[idx] || 0
+  }));
+
+  // ordenar por votos
+  list.sort((a,b)=>b.votes-a.votes);
+  const maxVotes = list.length ? list[0].votes : 0;
+
+  list.forEach(c=>{
+    const color = PARTY_COLORS[c.party] || "#6b7280";
+    const pct = totalLocal>0 ? (c.votes/totalLocal)*100 : 0;
+    const isWinner = c.votes === maxVotes && c.votes>0;
+
+    const row = document.createElement("div");
+    row.className = "candidate-row" + (isWinner ? " winner" : "");
+
+    row.innerHTML = `
+      <div class="candidate-info">
+        <img src="${c.photo}" class="candidate-photo" alt="${c.name}">
+        <div>
+          <div style="font-weight:700;">
+            ${c.name}
+            ${isWinner ? `<span class="winner-tag">✓ Gana aquí</span>` : ""}
+          </div>
+          <span class="party-badge" style="background:${color};">${c.party}</span>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div>${c.votes.toLocaleString("es-CL")}</div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px;">
+          <div class="bar-rail"><div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${color};"></div></div>
+          <span class="percent">${pct.toFixed(1)}%</span>
+        </div>
+      </div>
+    `;
+    resultsDiv.appendChild(row);
+  });
+
+  if(value === "GLOBAL"){
+    totalBox.innerHTML =
+      `Total votos válidos (exterior): <b>${totalGlobal.toLocaleString("es-CL")}</b>`;
+  }else{
+    totalBox.innerHTML =
+      `Total votos en el país seleccionado: <b>${totalLocal.toLocaleString("es-CL")}</b> · Total exterior global: <b>${totalGlobal.toLocaleString("es-CL")}</b>`;
+  }
+}
+
+async function load(){
+  try{
+    const txt = await fetch(SHEET_URL + "&t=" + Date.now(), {cache:"no-store"}).then(r=>r.text());
+    parseCSV(txt);
+    buildCountryOptions("");
+    document.getElementById("countrySelect").value = "GLOBAL";
+    renderCountry("GLOBAL");
+
+    const stamp = new Date().toLocaleString("es-CL",{dateStyle:"medium",timeStyle:"short"});
+    document.getElementById("ts").textContent  = "Actualizado: " + stamp;
+    document.getElementById("ts2").textContent = stamp;
+  }catch(e){
+    console.error(e);
+  }
+}
+
+// Eventos
+document.getElementById("countrySelect").addEventListener("change", e=>{
+  renderCountry(e.target.value);
+});
+
+document.getElementById("countrySearch").addEventListener("input", e=>{
+  const q = e.target.value;
+  const current = document.getElementById("countrySelect").value;
+  buildCountryOptions(q);
+  // mantener selección si sigue existiendo
+  const sel = document.getElementById("countrySelect");
+  const opt = Array.from(sel.options).find(o=>o.value===current);
+  sel.value = opt ? current : "GLOBAL";
+  renderCountry(sel.value);
+});
+
+// Modo oscuro
+const toggleBtn = document.getElementById("darkToggle");
+toggleBtn.addEventListener("click", ()=>{
+  document.body.classList.toggle("dark");
+  toggleBtn.textContent = document.body.classList.contains("dark")
+    ? "☀️ Modo claro"
+    : "🌙 Modo oscuro";
+});
+
+// inicial
+load();
+setInterval(load,60000);
+</script>
+</body>
+</html>
